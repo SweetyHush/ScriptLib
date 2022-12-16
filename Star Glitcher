@@ -1,0 +1,74 @@
+local player = game:GetService("Players").LocalPlayer
+local chr = player.Character
+if not chr or not chr.Parent then
+    chr = player.CharacterAdded:Wait()
+end
+local pGui = player.PlayerGui
+local glitcher = chr:WaitForChild("StarGlitcherRevitalized")
+local equip = pGui.SkinShop.MainFrame.Screens.SkinEquip.Buttons.Equip
+local sillyString = pGui.SkinShop.MainFrame.Screens.SkinEquip.Data["🅱️AYHEM"]
+local modeData = sillyString.ViewportFrame.WorldModel.char.ModeData
+local playerData = game:GetService("Workspace").Saving[tostring(player) .. "'s Data"]
+if not isfolder("GameData") then
+    makefolder("GameData")
+end
+if not isfile("GameData/StarForms.txt") then
+    writefile("GameData/StarForms.txt", "")
+end
+
+for i,v in pairs(playerData.SkinsUnlocked:GetDescendants()) do
+    if v:IsA("BoolValue") then
+        v.Value = true
+    end
+end
+
+local function saveData(newData)
+    if not isfolder("GameData") then
+        makefolder("GameData")
+    end
+    if not isfile("GameData/StarForms.txt") then
+        writefile("GameData/StarForms.txt", "")
+    end
+    local data = readfile("GameData/StarForms.txt")
+    local oldData = {}
+    repeat 
+        data = data:gsub("%w+,", function(c) table.insert(oldData, c) return "" end)
+    until not string.match(data, "%w+,")
+    
+    print(#oldData, oldData)
+    for i,v in pairs(oldData) do
+        print(i,v)
+    end
+    
+    if #oldData <= 0 then
+        writefile("GameData/StarForms.txt", tostring(newData) .. ",")
+    else
+        writefile("GameData/StarForms.txt", readfile("GameData/StarForms.txt") .. "\n" .. tostring(newData) .. ",")
+    end
+end
+
+local function setSkin(side, mode, skinVal)
+    playerData.ActiveSkins[side][mode].Value = skinVal
+end
+
+local function setMusic(side, mode)
+    local skin = playerData.ActiveSkins[side][mode].Value
+    if skin and skin ~="" then
+        local musicMod = require(game:GetService("ReplicatedStorage").ModeData[side].ModeSkins)
+        chr[tostring(player) .. "'s Music"].Theme.SoundId = "rbxassetid://" .. musicMod[mode][skin].MusicData.MusicID
+    end
+end
+
+player.CharacterAdded:Connect(function(character)
+    chr = character
+    glitcher = chr:WaitForChild("StarGlitcherRevitalized")
+end)
+
+glitcher.Mode.Changed:Connect(function()
+    wait(.3)
+    setMusic(glitcher.Side.Value, glitcher.Mode.Value)
+end)
+
+equip.MouseButton1Click:Connect(function()
+    setSkin(modeData.Side.Value, modeData.Mode.Value, modeData.SkinVal.Value)
+end)
