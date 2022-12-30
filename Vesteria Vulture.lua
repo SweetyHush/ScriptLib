@@ -10,6 +10,10 @@ if game.GameId == 833209132 then
     local running = true
     local items = game:GetService("Workspace").placeFolders.items
 
+    if not isfolder("GameData") then
+        makefolder("GameData") 
+    end
+
     local function collectItems()
         for i, v in pairs(items:GetChildren()) do
             local args = {
@@ -29,7 +33,16 @@ if game.GameId == 833209132 then
         writefile("GameData/Vulture Config.json", httpService:JSONEncode(data))
     end
 
-    local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
+    local function loadUILib()
+        local success = pcall(function()
+            Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
+        end)
+        if not success then
+            wait(1)
+            loadUILib()
+        end
+    end
+    loadUILib()
 
     local Window = Rayfield:CreateWindow({
         Name = "Vesteria Vulture",
@@ -92,6 +105,10 @@ if game.GameId == 833209132 then
     Tab3:CreateLabel("Not all suggestions will be added.")
 
     local updateInfo = {
+        ["1.1.1"] = {
+            "- Added Hide Status to Config",
+            "- Patched CreateWindow refrence nil error"
+        },
         ["1.1.0"] = {
             "- Added Do Not Request Tab",
             "- Added Updates Tab",
@@ -117,6 +134,10 @@ if game.GameId == 833209132 then
     else
         UIData = {}
     end
+    if UIData["Hidden"] then
+        Hide()
+    end
+
     local tmp = Tab:CreateToggle({
         Name = "Auto Collect Items",
         CurrentValue = UIData["autoCollect"] or false,
@@ -179,6 +200,16 @@ if game.GameId == 833209132 then
         end
     })
 
+    inDtct = game:GetService("UserInputService").InputBegan:Connect(function(input, processed)
+        if (input.KeyCode == Enum.KeyCode.RightShift and not processed) then
+            if UIData["Hidden"] ~= nil then
+                UIData["Hidden"] = not UIData["Hidden"]
+            else
+                UIData["Hidden"] = true
+            end
+        end
+    end)
+
     cDtct = player.CharacterAdded:Connect(function(character)
         chr = character
     end)
@@ -193,6 +224,7 @@ if game.GameId == 833209132 then
         Name = "Kill Script",
         Callback = function()
             saveConfig(UIData)
+            inDtct:Disconnect()
             pRemoving:Disconnect()
             cDtct:Disconnect()
             Rayfield:Destroy()
