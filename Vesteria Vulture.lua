@@ -204,6 +204,9 @@ if game.GameId == 833209132 then
         if (input.KeyCode == Enum.KeyCode.RightShift and not processed) then
             if UIData["Hidden"] ~= nil then
                 UIData["Hidden"] = not UIData["Hidden"]
+                if not UIData["Hidden"] then
+                    Unhide()
+                end
             else
                 UIData["Hidden"] = true
             end
