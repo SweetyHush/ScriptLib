@@ -1,6 +1,7 @@
 repeat wait() until game:IsLoaded()
 
 if game.GameId == 833209132 then
+    local Rayfield, Hide, Unhide
     local httpService = game:GetService("HttpService")
     local player = game:GetService("Players").LocalPlayer
     local chr = player.Character
@@ -170,7 +171,7 @@ if game.GameId == 833209132 then
         Callback = function(Value)
             UIData["rangedCollect"] = Value
             while UIData["rangedCollect"] do
-                range = UIData["Range"] or 0
+                local range = UIData["Range"] or 0
                 for i,v in pairs(items:GetChildren()) do
                     if v:IsA("BasePart") then
                         local root = chr:WaitForChild("hitbox")

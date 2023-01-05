@@ -29,6 +29,7 @@ for i,v in pairs(clrUi:GetDescendants()) do
 end
 -- Functions
 local function getAdmin()
+    local admin
     local points = 0
     for i,v in pairs(game:GetService("Players"):GetChildren()) do
         if v.leaderstats.Time.Value >= points then
